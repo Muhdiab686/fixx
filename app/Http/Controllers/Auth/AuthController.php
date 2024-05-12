@@ -42,13 +42,11 @@ class AuthController extends Controller
         return response()->json(['user' => $user]);
     }
     
-
-   
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -60,29 +58,5 @@ class AuthController extends Controller
             return response()->json(['user' => $user, 'access_token' => $accessToken], 200);
         }
         return response()->json(['message' => 'Invalid credentials'], 401);
-    }
-
-
-    public function AddWorker( Request $request)
-    {
-        
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-        ]);
-    
-        if ($validator->fails()) {
-            
-            return response()->json($validator->errors(), 422);
-        }
-        $email = $request->name.random_int(1000,9999)."@gmail.com";
-        $password = $request->name.random_int(1000,9999);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $email,
-            'password' => Hash::make($password),
-            'role' => 'worker'
-        ]);
-    
-        return response()->json(['user' => $user]);
-    }    
+    }   
 }
