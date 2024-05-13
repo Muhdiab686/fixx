@@ -59,7 +59,7 @@ class AdminController extends Controller
         $qrCode = QrCode::size(200)->generate($item->id);
 
         return response()->json([
-            'message' => 'تم إنشاء السجل بنجاح',
+            'message' => 'Done',
             'item' => $item,
             'qr_code' => base64_encode($qrCode),
         ], 201);
