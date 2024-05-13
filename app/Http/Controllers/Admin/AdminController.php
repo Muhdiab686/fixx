@@ -13,7 +13,27 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AdminController extends Controller
 {
-    
+    public function AddWorker(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+
+            return response()->json($validator->errors(), 422);
+        }
+        $email = $request->name . random_int(1000, 9999) . "@gmail.com";
+        $password = $request->name . random_int(1000, 9999);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $email,
+            'password' => Hash::make($password),
+            'role' => 'worker'
+        ]);
+
+        return response()->json(['user' => $user]);
+    }
 
     public function AddElectrical(Request $request)
     {
