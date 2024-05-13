@@ -58,9 +58,9 @@ class AdminController extends Controller
 
         $qrCode = QrCode::size(200)->generate($item->id);
 
-        
+
         return response()->json([
-            'message' => 'Done',
+            'message' => '',
             'item' => $item,
             'qr_code' => base64_encode($qrCode),
         ], 201);
