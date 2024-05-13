@@ -13,7 +13,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AdminController extends Controller
 {
-      public function AddWorker(Request $request)
+    public function AddWorker(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -57,7 +57,7 @@ class AdminController extends Controller
         ]);
 
         $qrCode = QrCode::size(200)->generate($item->id);
-
+        
         return response()->json([
             'message' => 'تم إنشاء السجل بنجاح',
             'item' => $item,
