@@ -32,6 +32,10 @@ class AdminController extends Controller
             return response()->json(['error' => 'The team already has 4 workers.'], 400);
         }
         $email = $request->name . random_int(1000, 9999) . "@gmail.com";
+        if (User::where('email', $request->email)->exists()) {
+            $email = $request->name . random_int(1000, 9999) . "@gmail.com";
+            return;
+        }
         $password = $request->name . random_int(1000, 9999);
         $user = User::create([
             'name' => $request->name,
@@ -76,7 +80,7 @@ class AdminController extends Controller
             'notes' => 'nullable|string',
             'way_of_work' => 'nullable|string',
             'warranty_state'=> 'required|string',
-            'warranty_date'=> 'required|date',
+            'warranty_date'=> 'required',
         ]);
         if ($validator->fails()) {
 
