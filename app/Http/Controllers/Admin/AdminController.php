@@ -96,10 +96,9 @@ class AdminController extends Controller
             'warranty_date'=> $request->input('warranty_date'),
         ]);
 
-        $qrCode = QrCode::size(200)->generate($item->id);
+        $qrCode = QrCode::size(200)->generate($item);
         return response()->json([
             'message' => 'Done',
-            'item' => $item,
             'qr_code' => base64_encode($qrCode),
         ], 201);
         //$fileName = 'qrcode_' . $item->id . '.png';
