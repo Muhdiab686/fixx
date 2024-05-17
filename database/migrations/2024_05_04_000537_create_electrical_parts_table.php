@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('warning');
             $table->text('notes');
             $table->text('way_of_work');
+            $table->string('warranty_state');
+            $table->string('warranty_date');
             $table->timestamps();
         });
     }

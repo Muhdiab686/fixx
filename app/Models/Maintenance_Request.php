@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Maintenance_Request extends Model
 {
     use HasFactory;
+    protected $hidden = [
+        'updated_at',
+        'created_at',
+    ];
+    
     protected $fillable = [
         'free_day',
         'number',
@@ -17,7 +22,6 @@ class Maintenance_Request extends Model
         'Request_details',
         'Request_state',
         'warranty_state',
-        'Request_date',
         'consumable_parts',
         'repairs',
         'salary',

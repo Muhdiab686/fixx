@@ -5,25 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Rating extends Model
+class Worker extends Model
 {
     use HasFactory;
+
     protected $hidden = [
         'updated_at',
         'created_at',
     ];
+    protected $table = '_worker';
     protected $fillable = [
-        'star',
-        'nots',
+        'user_id',
         'maintenance_team_id',
-        'user_id'
     ];
-
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function maintenance_team(){
+    public function team()
+    {
         return $this->belongsTo(Maintenance_team::class);
     }
 }

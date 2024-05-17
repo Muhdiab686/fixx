@@ -52,7 +52,8 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        if (Auth::attempt($request->only('email', 'password'))) {
+        
+        if (Auth::attempt($request->only('email', 'password') )) {
             $user = Auth::user();
             $accessToken = $user->createToken('authToken')->plainTextToken;
             return response()->json(['user' => $user, 'access_token' => $accessToken], 200);

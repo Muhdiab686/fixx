@@ -9,11 +9,15 @@ class Maintenance_team extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id'
+        'name',
     ];
-
-    public function user(){
-        return $this->belongsTo(User::class);
+    protected $hidden = [
+        'updated_at',
+        'created_at',
+    ];
+    public function worker()
+    {
+        return $this->hasMany(Worker::class);
     }
 
     public function rating(){

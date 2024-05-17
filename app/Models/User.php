@@ -58,4 +58,9 @@ class User extends Authenticatable
     public function maintenance_Request(){
         return $this->hasMany(Maintenance_Request::class);
     }
+    public function worker()
+    {
+        return $this->hasMany(Worker::class);
+    }
 }
+
