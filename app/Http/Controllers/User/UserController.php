@@ -20,7 +20,7 @@ class UserController extends Controller
             'free_day' => 'required|string|max:255',
             'number' => 'required|string|max:255',
             'QR_code' => 'required|image|max:255',
-            'video' => 'string|max:255',
+            'video' => 'required',
             'notes' => 'string',
             'request_details' => 'string',
             'electrical_part_id' => 'exists:electrical_parts,id'
@@ -33,8 +33,15 @@ class UserController extends Controller
         $maintenanceRequest = new Maintenance_Request();
         $maintenanceRequest->free_day = $request->free_day;
         $maintenanceRequest->number = $request->number;
-        $maintenanceRequest->QR_code = $request->QR_code;
-        $maintenanceRequest->video = $request->video;
+        if ($request->hasFile('QR_code')) {
+            $imagePath = $request->file('QR_code')->store('public/qr_codes');
+            $maintenanceRequest->QR_code = str_replace('public/', '', $imagePath);
+        }
+
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store('public/videos');
+            $maintenanceRequest->video = str_replace('public/', '', $videoPath);
+        }
         $maintenanceRequest->notes = $request->notes;
         $maintenanceRequest->request_details = $request->request_details;
         $maintenanceRequest->user_id = Auth()->user()->id;

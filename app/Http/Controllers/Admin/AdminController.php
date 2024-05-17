@@ -32,10 +32,6 @@ class AdminController extends Controller
             return response()->json(['error' => 'The team already has 4 workers.'], 400);
         }
         $email = $request->name . random_int(1000, 9999) . "@gmail.com";
-        if (User::where('email', $request->email)->exists()) {
-            $email = $request->name . random_int(1000, 9999) . "@gmail.com";
-            return;
-        }
         $password = $request->name . random_int(1000, 9999);
         $user = User::create([
             'name' => $request->name,
@@ -80,7 +76,7 @@ class AdminController extends Controller
             'notes' => 'nullable|string',
             'way_of_work' => 'nullable|string',
             'warranty_state'=> 'required|string',
-            'warranty_date'=> 'required',
+            'warranty_date'=> 'required|date',
         ]);
         if ($validator->fails()) {
 
@@ -96,11 +92,20 @@ class AdminController extends Controller
             'warranty_date'=> $request->input('warranty_date'),
         ]);
 
-        $qrCode = QrCode::size(200)->generate($item);
-        $fileName = 'qrcode_' . $item->id . '.png';
-        $filePath = storage_path('app/public/' . $fileName);
-        file_put_contents($filePath, $qrCode);
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        $qrCode = QrCode::size(200)->generate($item->id);
+        return response()->json([
+            'message' => 'Done',
+            'item' => $item,
+            'qr_code' => base64_encode($qrCode),
+        ], 201);
+        //$fileName = 'qrcode_' . $item->id . '.png';
+        //$filePath = storage_path('app/public/' . $fileName);
+
+        // Save the QR code as a file
+        //file_put_contents($filePath, $qrCode);
+        
+        // Return the file as a download response
+        //return response()->download($filePath)->deleteFileAfterSend(true);
     }
 
     public function Show_Team(Request $request)
