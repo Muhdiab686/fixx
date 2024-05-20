@@ -8,6 +8,7 @@ use App\Models\Maintenance_team;
 use App\Models\Worker;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\Location;
 use App\Models\Maintenance_Request;
 use Illuminate\Support\Facades\Hash;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -51,4 +52,23 @@ class UserController extends Controller
         return response()->json(['message' => 'Maintenance request created successfully.', 'data' => $maintenanceRequest], 201);
     }
 
+
+
+    public function userlocation(Request $request)
+    {
+        
+        $validator =Validator::make($request->all(), [
+            'point' => 'required',
+          
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+//  
+        $location = Location::create([
+            'point'=> $request->point,
+            'user_id' => Auth()->user()->id,
+        ]);
+        return response()->json(['message' => 'Location created successfully', 'location' => $location], 201);
+    }
 }

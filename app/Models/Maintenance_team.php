@@ -10,6 +10,7 @@ class Maintenance_team extends Model
     use HasFactory;
     protected $fillable = [
         'name',
+        'team_location'
     ];
     protected $hidden = [
         'updated_at',

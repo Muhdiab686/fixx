@@ -25,6 +25,7 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::delete('deleteWorker', [AdminController::class, 'DeleteWorker']);
         Route::post('addelectrical', [AdminController::class, 'AddElectrical']);
         Route::post('updateRequestByAdmin', [AdminController::class,'updateRequestByAdmin']);
+        Route::get('show_qr', [AdminController::class,'show_qr']);
     });
     Route::group(["middleware" => "worker"], function () {
         Route::post("updateRequestByWorker", [WorkerController::class,"updateRequestByWorker"]);

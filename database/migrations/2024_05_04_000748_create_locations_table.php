@@ -14,7 +14,8 @@ return new class extends Migration {
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->point('point');
+            $table->string('longitude');
+            $table->string('latitude');
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete;
             $table->timestamps();
         });

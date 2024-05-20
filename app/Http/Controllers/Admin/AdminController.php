@@ -12,6 +12,8 @@ use App\Models\Electrical_parts;
 use App\Models\Maintenance_Request;
 use Illuminate\Support\Facades\Hash;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use GuzzleHttp\Client;
+use App\Models\Location;
 
 
 class AdminController extends Controller
@@ -97,18 +99,25 @@ class AdminController extends Controller
         ]);
 
         $qrCode = QrCode::size(200)->generate($item);
+        $QR =  \App\Models\QRcode::create([
+            'QR_base64'=>base64_encode($qrCode),
+            'electrical_part_id'=> $item->id,
+        ]);
         return response()->json([
             'message' => 'Done',
-            'qr_code' => base64_encode($qrCode),
+            'qr_code' => $QR
         ], 201);
-        //$fileName = 'qrcode_' . $item->id . '.png';
-        //$filePath = storage_path('app/public/' . $fileName);
 
-        // Save the QR code as a file
-        //file_put_contents($filePath, $qrCode);
-        
-        // Return the file as a download response
-        //return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+
+    public function show_qr(Request $request){
+
+        $qr =  \App\Models\QRcode::where("QR_base64" ,$request->input('QRcode'))->with('part')->get();
+            return response()->json([
+                'message' => 'Done',
+                'qr_code' => $qr
+            ], 201) ;
     }
 
     public function Show_Team(Request $request)
@@ -118,14 +127,13 @@ class AdminController extends Controller
         foreach ($teams as $team) {
             $currentWorkersCount = Worker::where('maintenance_team_id', $team->id)->count();
             $teamsInfo[] = [
+                'id'=> $team->id,
                 'team_name' => $team->name,
                 'current_workers_count' => $currentWorkersCount
             ];
         }
         return response()->json($teamsInfo, 200);
     }
-
-
     public function Show_Worker(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -163,7 +171,40 @@ class AdminController extends Controller
         $maintenanceRequest->salary = $request->salary;
         $maintenanceRequest->save();
 
+        $client = new Client();
+        $origin = '37.7749,-122.4194'; 
+        $destination = '34.0522,-118.2437';
+        $apiKey = 'YOUR_API_KEY';
+
+        $response = $client->get('https://maps.googleapis.com/maps/api/distancematrix/json', [
+            'query' => [
+                'origins' => $origin,
+                'destinations' => $destination,
+                'key' => $apiKey
+            ]
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        $distance = $data['rows'][0]['elements'][0]['distance']['text'];
+        $duration = $data['rows'][0]['elements'][0]['duration']['text'];
+
+
         return response()->json(['message' => 'Maintenance request updated successfully by admin.', 'data' => $maintenanceRequest], 200);
+    }
+
+
+    public function team_location(Request $request)
+    {
+        // التحقق من صحة البيانات المدخلة
+        $validatedData = $request->validate([
+            'team_location' => 'required|point', // تأكيد أن النقطة مطلوبة ومن نوع نقطة
+        ]);
+
+        // إنشاء موقع جديد لفريق الصيانة
+        $team = Maintenance_team::update($validatedData);
+
+        // إرجاع الرد بنجاح مع البيانات الجديدة
+        return response()->json(['message' => 'Maintenance team location created successfully', 'team' => $team], 201);
     }
 
 

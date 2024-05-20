@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\QRcode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Electrical_parts extends Model
 {
     use HasFactory;
-    protected $hidden = [
-        'updated_at',
+   protected $hidden = [
+         'updated_at',
         'created_at',
     ];
     
@@ -24,5 +25,10 @@ class Electrical_parts extends Model
     ];
     public function maintenance_Request(){
         return $this->hasMany(Maintenance_Request::class);
+    }
+
+    public function qrcode()
+    {
+        return $this->hasOne(\App\Models\QRcode::class);
     }
 }

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string("warranty_state")->default("null");
             $table->string("salary")->default("null");
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete;
+            $table->foreignId('worker_id')->constrained('_worker')->cascadeOnDelete;
             $table->foreignId('electrical_part_id')->constrained('electrical_parts')->cascadeOnDelete;
             $table->timestamps();
         });

@@ -14,9 +14,8 @@ class Location extends Model
         'created_at',
     ];
     protected $fillable = [
-        'city',
-        'region',
-        'coordinates',
+        'longitude',
+        'latitude',
         'user_id'
     ];
     public function user(){
