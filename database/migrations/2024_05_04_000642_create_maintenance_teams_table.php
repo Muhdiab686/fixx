@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('maintenance_teams', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('team_location')->default('MULL');
+            $table->string('team_location')->default('null');
             $table->timestamps();
         });
     }
