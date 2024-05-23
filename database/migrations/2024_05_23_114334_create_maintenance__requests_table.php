@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('maintenance__requests', function (Blueprint $table) {
+
             $table->id();
             $table->string("free_day");
             $table->string("number");
