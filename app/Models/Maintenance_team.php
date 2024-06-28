@@ -10,7 +10,10 @@ class Maintenance_team extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'team_location'
+        'state',
+        'latitude',
+        'longitude',
+        'location_type'
     ];
     protected $hidden = [
         'updated_at',
@@ -19,6 +22,10 @@ class Maintenance_team extends Model
     public function worker()
     {
         return $this->hasMany(Worker::class);
+    }
+    public function request()
+    {
+        return $this->hasMany(Maintenance_Request::class);
     }
 
     public function rating(){

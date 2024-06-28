@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
+use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
@@ -10,6 +11,12 @@ use App\Models\Maintenance_Request;
 
 class WorkerController extends Controller
 {
+    public function Show_request(Request $request){
+        $team_id = Worker::where('user_id',Auth()->user()->id)->first();
+        $request = Maintenance_Request::where('team_id',$team_id->maintenance_team_id)->get();
+        return response()->json(['Maintenance Request'=> $request, 200]);
+
+    }
     public function updateRequestByWorker(Request $request)
     {
         $validator = Validator::make($request->all(), [

@@ -11,10 +11,12 @@ use App\Models\User;
 use App\Models\Electrical_parts;
 use App\Models\Maintenance_Request;
 use Illuminate\Support\Facades\Hash;
+use Psy\Command\WhereamiCommand;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use GuzzleHttp\Client;
 use App\Models\Location;
-
+use GeoDistance\GeoDistance;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -110,6 +112,7 @@ class AdminController extends Controller
 
     }
 
+    public function show_qr(Request $request){
 
         $qr =  \App\Models\QRcode::where("QR_base64" ,$request->input('QRcode'))->with('part')->get();
             return response()->json([
@@ -127,6 +130,7 @@ class AdminController extends Controller
             $teamsInfo[] = [
                 'id'=> $team->id,
                 'team_name' => $team->name,
+                'State_team' =>$team->state,
                 'current_workers_count' => $currentWorkersCount
             ];
         }
@@ -148,6 +152,11 @@ class AdminController extends Controller
 
     public function updateRequestByAdmin(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+            'warranty_state' => 'nullable|string|max:255',
+            'salary' => 'string|max:255',
+        ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -164,4 +173,108 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Maintenance request updated successfully by admin.', 'data' => $maintenanceRequest], 200);
     }
+    public function Pending_report(Request $request){
+        $report = Maintenance_Request::with('user','team')->Where('Request_state', 'Pending')->get();
+        return response()->json($report);
+    }
+    public function report(Request $request)
+    {
+        $report = Maintenance_Request::with('user', 'team')->get();
+        return response()->json($report);
+    }
+
+    public function finish_report(Request $request)
+    {
+        $report = Maintenance_Request::with('user', 'team')->Where('Request_state','Complete')->get();
+        return response()->json($report);
+    }
+
+    public function Schedling(Request $request ){ {
+            $startTime = Carbon::parse($request->input('start_time'));
+            $endTime = Carbon::parse($request->input('end_time'));
+            
+            try {
+                $maintenanceRequest = Maintenance_Request::findOrFail($request->requestId);
+
+                if ($maintenanceRequest->isConflicting($startTime, $endTime)) {
+                    throw new \Exception('The schedule conflicts with an existing request.');
+                }
+               
+                $maintenanceRequest->schedule($startTime, $endTime);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Maintenance request scheduled successfully.'
+                ]);
+            }
+            
+            catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+        }
+    }
+    public function GenerateStatistics(Request $request){
+        
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $totalRequests = Maintenance_Request::whereBetween('created_at', [$startDate, $endDate])->count();
+        $pendingRequests = Maintenance_Request::whereBetween('created_at', [$startDate, $endDate])->where('request_state', 'Pending')->count();
+        $completedRequests = Maintenance_Request::whereBetween('created_at', [$startDate, $endDate])->where('request_state', 'Complete')->count();
+
+        return response()->json([
+            'total_requests' => $totalRequests,
+            'pending_requests' => $pendingRequests,
+            'completed_requests' => $completedRequests,
+        ]);
+    }
+
+    public function GenerateRatio(Request $request)
+    {
+        $request->validate([
+            'start_month' => 'required|date_format:Y-m',
+            'end_month' => 'required|date_format:Y-m|after_or_equal:start_month',
+        ]);
+
+        $startMonth = new Carbon($request->input('start_month'));
+        $endMonth = new Carbon($request->input('end_month'));
+
+        $startYear = $startMonth->year;
+        $endYear = $endMonth->year;
+
+        $startMonthNumber = $startMonth->month;
+        $endMonthNumber = $endMonth->month;
+
+        $requestsStartMonth = Maintenance_Request::whereYear('created_at', $startYear)
+            ->whereMonth('created_at', $startMonthNumber)
+            ->count();
+
+        $requestsEndMonth = Maintenance_Request::whereYear('created_at', $endYear)
+            ->whereMonth('created_at', $endMonthNumber)
+            ->count();
+
+        // Calculate ratio
+        if ($requestsStartMonth > 0) {
+            $ratio = (($requestsEndMonth - $requestsStartMonth) / $requestsStartMonth) * 100;
+        } else {
+            $ratio = null;
+        }
+
+        return response()->json([
+            'start_month' => $startMonth->format('Y-m'),
+            'end_month' => $endMonth->format('Y-m'),
+            'requests_start_month' => $requestsStartMonth,
+            'requests_end_month' => $requestsEndMonth,
+            'ratio' => $ratio."%",
+        ]);
+    }
+
 }

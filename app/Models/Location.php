@@ -14,11 +14,13 @@ class Location extends Model
         'created_at',
     ];
     protected $fillable = [
+        'name',
         'longitude',
         'latitude',
-        'user_id'
+        'location_type',
     ];
-    public function user(){
-        return $this->hasOne(User::class);
-    }
+    // public function user(){
+    //     return $this->hasOne(User::class);
+    // }
+   
 }
