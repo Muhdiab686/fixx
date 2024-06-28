@@ -111,8 +111,6 @@ class AdminController extends Controller
     }
 
 
-    public function show_qr(Request $request){
-
         $qr =  \App\Models\QRcode::where("QR_base64" ,$request->input('QRcode'))->with('part')->get();
             return response()->json([
                 'message' => 'Done',
@@ -148,14 +146,8 @@ class AdminController extends Controller
         return response()->json($workers, 200);
     }
 
-
     public function updateRequestByAdmin(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|integer',
-            'warranty_state' => 'nullable|string|max:255',
-            'salary' => 'string|max:255',
-        ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -166,46 +158,10 @@ class AdminController extends Controller
         if (!$maintenanceRequest) {
             return response()->json(['error' => 'Maintenance request not found.'], 404);
         }
-
         $maintenanceRequest->warranty_state = $request->warranty_state;
         $maintenanceRequest->salary = $request->salary;
         $maintenanceRequest->save();
 
-        $client = new Client();
-        $origin = '37.7749,-122.4194'; 
-        $destination = '34.0522,-118.2437';
-        $apiKey = 'YOUR_API_KEY';
-
-        $response = $client->get('https://maps.googleapis.com/maps/api/distancematrix/json', [
-            'query' => [
-                'origins' => $origin,
-                'destinations' => $destination,
-                'key' => $apiKey
-            ]
-        ]);
-
-        $data = json_decode($response->getBody(), true);
-        $distance = $data['rows'][0]['elements'][0]['distance']['text'];
-        $duration = $data['rows'][0]['elements'][0]['duration']['text'];
-
-
         return response()->json(['message' => 'Maintenance request updated successfully by admin.', 'data' => $maintenanceRequest], 200);
     }
-
-
-    public function team_location(Request $request)
-    {
-        // التحقق من صحة البيانات المدخلة
-        $validatedData = $request->validate([
-            'team_location' => 'required|point', // تأكيد أن النقطة مطلوبة ومن نوع نقطة
-        ]);
-
-        // إنشاء موقع جديد لفريق الصيانة
-        $team = Maintenance_team::update($validatedData);
-
-        // إرجاع الرد بنجاح مع البيانات الجديدة
-        return response()->json(['message' => 'Maintenance team location created successfully', 'team' => $team], 201);
-    }
-
-
 }

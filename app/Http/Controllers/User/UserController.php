@@ -24,8 +24,6 @@ class UserController extends Controller
             'video' => 'required',
             'notes' => 'string',
             'request_details' => 'string',
-            'electrical_part_id' => 'exists:electrical_parts,id'
-        ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -50,25 +48,5 @@ class UserController extends Controller
         $maintenanceRequest->save();
 
         return response()->json(['message' => 'Maintenance request created successfully.', 'data' => $maintenanceRequest], 201);
-    }
-
-
-
-    public function userlocation(Request $request)
-    {
-        
-        $validator =Validator::make($request->all(), [
-            'point' => 'required',
-          
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-//  
-        $location = Location::create([
-            'point'=> $request->point,
-            'user_id' => Auth()->user()->id,
-        ]);
-        return response()->json(['message' => 'Location created successfully', 'location' => $location], 201);
     }
 }
