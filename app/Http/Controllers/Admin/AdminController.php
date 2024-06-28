@@ -91,7 +91,7 @@ class AdminController extends Controller
             return response()->json($validator->errors(), 422);
         }
         if ($request->hasFile('photo')) {
-            $photo = $request->QR_code;
+            $photo = $request->photo;
             $newphoto = time() . $photo->getClientOriginalName();
             $photo->move(public_path('upload'), $newphoto);
             $path = "public/upload/$newphoto";

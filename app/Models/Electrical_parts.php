@@ -16,6 +16,7 @@ class Electrical_parts extends Model
     
     protected $fillable = [
         'name',
+        'photo',
         'size',
         'warning',
         'notes',
