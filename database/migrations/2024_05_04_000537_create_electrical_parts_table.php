@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('electrical_parts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('photo');
             $table->integer('size');
             $table->string('warning');
             $table->text('notes');

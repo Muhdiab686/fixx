@@ -90,8 +90,15 @@ class AdminController extends Controller
 
             return response()->json($validator->errors(), 422);
         }
+        if ($request->hasFile('photo')) {
+            $photo = $request->QR_code;
+            $newphoto = time() . $photo->getClientOriginalName();
+            $photo->move(public_path('upload'), $newphoto);
+            $path = "public/upload/$newphoto";
+        }
         $item = Electrical_parts::create([
             'name' => $request->input('name'),
+            'photo' =>$path,
             'size' => $request->input('size'),
             'warning' => $request->input('warning'),
             'notes' => $request->input('notes'),
@@ -100,7 +107,7 @@ class AdminController extends Controller
             'warranty_date'=> $request->input('warranty_date'),
         ]);
 
-        $qrCode = QrCode::size(200)->generate($item);
+        $qrCode = QrCode::size(200)->generate($item->id);
         $QR =  \App\Models\QRcode::create([
             'QR_base64'=>base64_encode($qrCode),
             'electrical_part_id'=> $item->id,
@@ -114,7 +121,7 @@ class AdminController extends Controller
 
     public function show_qr(Request $request){
 
-        $qr =  \App\Models\QRcode::where("QR_base64" ,$request->input('QRcode'))->with('part')->get();
+        $qr =  \App\Models\QRcode::where("id" ,$request->input('QRcode'))->with('part')->get();
             return response()->json([
                 'message' => 'Done',
                 'qr_code' => $qr
