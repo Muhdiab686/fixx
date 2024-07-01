@@ -21,8 +21,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'free_day' => 'required|array',
             'number' => 'required|string|max:255',
-            'QR_code' => 'required|image|max:255',
-            'video' => 'required',
             'notes' => 'string',
             'request_details' => 'string',
             'latitude' => 'required',

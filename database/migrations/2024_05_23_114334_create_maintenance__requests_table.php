@@ -19,8 +19,8 @@ return new class extends Migration
             $table->id();
             $table->string("free_day")->nullable();
             $table->string("number");
-            $table->string("QR_code");
-            $table->string("video")->nullable;
+            $table->string("QR_code")->nullable();
+            $table->string("video")->nullable();
             $table->text("notes")->default("null");
             $table->string("Request_details")->default("null");
             $table->decimal('latitude', 10, 7);

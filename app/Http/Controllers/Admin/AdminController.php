@@ -163,7 +163,6 @@ class AdminController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
-            'warranty_state' => 'nullable|string|max:255',
             'salary' => 'string|max:255',
         ]);
 
@@ -176,7 +175,12 @@ class AdminController extends Controller
         if (!$maintenanceRequest) {
             return response()->json(['error' => 'Maintenance request not found.'], 404);
         }
-        $maintenanceRequest->warranty_state = $request->warranty_state;
+        if($maintenanceRequest->QR_code){
+            $maintenanceRequest->warranty_state = 'مكفول';
+        }else{
+            $maintenanceRequest->warranty_state = 'غير مكفول';
+        }
+       
         $maintenanceRequest->salary = $request->salary;
         $maintenanceRequest->save();
 
