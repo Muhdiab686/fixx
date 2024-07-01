@@ -61,6 +61,7 @@ class UserController extends Controller
         $maintenanceRequest->user_id = Auth()->user()->id;
         $closestTeam = $maintenanceRequest->closestTeam();
         $maintenanceRequest->team()->associate($closestTeam);
+        $maintenanceRequest->elec_id = $request->elec_id;
         $maintenanceRequest->save();
 
        

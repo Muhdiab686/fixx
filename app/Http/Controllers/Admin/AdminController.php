@@ -121,10 +121,12 @@ class AdminController extends Controller
 
     public function show_qr(Request $request){
 
-        $qr =  \App\Models\QRcode::where("id" ,$request->input('QRcode'))->with('part')->get();
+        $qr =  \App\Models\QRcode::where("id" ,$request->input('QRcode'))->with('part')->first();
+         $q = $qr->electrical_part_id;
+        $request = Maintenance_Request::where('elec_id',$q)->with('elec')->get();
             return response()->json([
                 'message' => 'Done',
-                'qr_code' => $qr
+                'qr_code' => $request
             ], 201) ;
     }
 

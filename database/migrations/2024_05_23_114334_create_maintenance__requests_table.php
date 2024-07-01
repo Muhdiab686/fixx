@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string("salary")->default("null");
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete;
             $table->foreignId('team_id')->constrained('maintenance_teams')->cascadeOnDelete;
+            $table->foreignId('elec_id')->constrained('electrical_parts')->cascadeOnDelete;
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
             $table->timestamps();

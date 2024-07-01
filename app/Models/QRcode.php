@@ -22,6 +22,6 @@ class QRcode extends Model
     ];
     public function part()
     {
-        return $this->belongsTo(Electrical_parts::class,'electrical_part_id');
+        return $this->belongsTo(Electrical_parts::class);
     }
 }

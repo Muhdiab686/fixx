@@ -32,4 +32,5 @@ class Electrical_parts extends Model
     {
         return $this->hasOne(\App\Models\QRcode::class);
     }
+
 }

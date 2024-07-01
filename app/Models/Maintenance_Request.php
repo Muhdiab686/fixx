@@ -28,6 +28,7 @@ class Maintenance_Request extends Model
         'salary',
         'user_id',
         'team_id',
+        'elec_id',
         'start_time',
         'end_time',
     ];
@@ -40,6 +41,10 @@ class Maintenance_Request extends Model
     public function team()
     {
         return $this->belongsTo(Maintenance_team::class);
+    }
+    public function elec()
+    {
+        return $this->belongsTo(Electrical_parts::class);
     }
 
     public function closestTeam()
