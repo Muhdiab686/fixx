@@ -119,6 +119,11 @@ class AdminController extends Controller
 
     }
 
+    public function ShowElectrical(Request $request){
+        $part = Electrical_parts::get();
+        return response()->json($part);
+    }
+
     public function show_qr(Request $request){
 
         $qr =  \App\Models\QRcode::where("id" ,$request->input('QRcode'))->with('part')->first();
