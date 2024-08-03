@@ -17,14 +17,16 @@ class Worker extends Model
     protected $fillable = [
         'user_id',
         'maintenance_team_id',
+        'status'
     ];
-    public function user()
-    {
+
+
+    public function user(){
         return $this->belongsTo(User::class);
     }
+    
 
-    public function team()
-    {
+    public function team(){
         return $this->belongsTo(Maintenance_team::class);
     }
 }

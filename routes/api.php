@@ -31,16 +31,21 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::get('finish_report', [AdminController::class, 'finish_report']);
         Route::get('pending_report', [AdminController::class, 'Pending_report']);
         Route::post('schedling', [AdminController::class, 'Schedling']);
+        Route::get('show_schedling', [AdminController::class, 'Showschedling']);
+        Route::get('show_schedling_not', [AdminController::class, 'Shownotschedling']);
         Route::post('generateStatistics', [AdminController::class, 'GenerateStatistics']);
         Route::post('generateRatio', [AdminController::class, 'GenerateRatio']);
         Route::get("show_rating", [UserController::class, "show_rating"]);
 
+        Route::post('leaverequests/{id}', [AdminController::class, 'handleLeaveRequest']);
     });
     Route::group(["middleware" => "worker"], function () {
+        Route::get('showelectrical', [AdminController::class, 'ShowElectrical']);
+        Route::get('show_qr', [AdminController::class,'show_qr']);
         Route::post("updateRequestByWorker", [WorkerController::class,"updateRequestByWorker"]);
         Route::get("showRequest", [WorkerController::class, "Show_request"]);
         Route::get("show_rating", [UserController::class, "show_rating"]);
-
+        Route::post('requestleave', [WorkerController::class, 'requestLeave']);
     });
     Route::group(["middleware" => "user"], function () {
         Route::post("storeRequestByUser", [UserController::class,"storeRequestByUser"]);

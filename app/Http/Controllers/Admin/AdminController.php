@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\LeaveRequest;
 use App\Models\Maintenance_team;
 use App\Models\Worker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Electrical_parts;
@@ -234,6 +236,7 @@ class AdminController extends Controller
             }
         }
     }
+
     public function GenerateStatistics(Request $request){
         
         $request->validate([
@@ -293,6 +296,52 @@ class AdminController extends Controller
             'requests_end_month' => $requestsEndMonth,
             'ratio' => $ratio."%",
         ]);
+    }
+
+
+    public function Showschedling(Request $request){
+        $schedule = Maintenance_Request::whereNotNull('start_time')
+            ->whereNotNull('end_time')
+            ->get();
+            return response()->json([
+                'success' => true,
+                'message' => $schedule
+            ], 400);
+    }
+  public function Shownotschedling(Request $request){
+    $shudle = Maintenance_Request::whereNull('start_time')
+        ->orWhereNull('end_time')
+        ->get();
+        return response()->json([
+            'success' => true,
+            'message' => $shudle
+        ], 400);
+    }
+
+    public function handleLeaveRequest(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Approved,Rejected',
+        ]);
+
+        $leaveRequest = LeaveRequest::find($id);
+
+        if (!$leaveRequest) {
+            return response()->json(['error' => 'Leave request not found.'], 404);
+        }
+
+        DB::transaction(function () use ($leaveRequest, $request) {
+            $leaveRequest->status = $request->status;
+            $leaveRequest->save();
+
+            if ($request->status == 'Approved') {
+                $worker = Worker::find($leaveRequest->worker_id);
+                $worker->status = 'offline';
+                $worker->maintenance_team_id = null; 
+                $worker->save();
+            }
+        });
+        return response()->json(['message' => 'Leave request updated successfully.', 'data' => $leaveRequest], 200);
     }
 
 }

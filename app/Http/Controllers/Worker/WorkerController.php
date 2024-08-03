@@ -3,20 +3,40 @@
 namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
+use App\Models\LeaveRequest;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
+use Carbon\Carbon;
 use App\Models\Maintenance_Request;
+use App\Models\Maintenance_team;
+
 
 class WorkerController extends Controller
 {
-    public function Show_request(Request $request){
-        $team_id = Worker::where('user_id',Auth()->user()->id)->first();
-        $request = Maintenance_Request::where('team_id',$team_id->maintenance_team_id)->get();
-        return response()->json(['Maintenance Request'=> $request, 200]);
+    public function Show_request(Request $request)
+    {
+        $team_id = Worker::where('user_id', Auth()->user()->id)->first();
 
+        if ($team_id) {
+            $scheduledRequests = Maintenance_Request::where('team_id', $team_id->maintenance_team_id)
+                ->whereNotNull('start_time')
+                ->whereNotNull('end_time')
+                ->get();
+            $now = now();
+            $hasCurrentRequest = $scheduledRequests->contains(function ($request) use ($now) {
+                return $request->start_time->eq($now);
+            });
+
+            if ($hasCurrentRequest) {
+                Maintenance_team::update(['state' => 'مشغول']);
+            }
+            return response()->json(['Maintenance Requests' => $scheduledRequests], 200);
+        } else {
+            return response()->json(['message' => 'Team not found'], 404);
+        }
     }
+
     public function updateRequestByWorker(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -41,8 +61,39 @@ class WorkerController extends Controller
         $maintenanceRequest->repairs = $request->repairs;
         $maintenanceRequest->save();
 
+        if ($request->request_state === 'Complete') {
+            $team = Maintenance_team::find($maintenanceRequest->team_id); 
+            if ($team) {
+                $team->state = 'Empty';
+                $team->save();
+            }
+        }
+
+
         return response()->json(['message' => 'Maintenance request updated successfully by worker.', 'data' => $maintenanceRequest], 200);
     }
 
+    public function requestLeave(Request $request)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        $worker = Worker::where('user_id', Auth()->user()->id)->first();
+
+        if (!$worker) {
+            return response()->json(['error' => 'Worker not found.'], 404);
+        }
+        $endDate = Carbon::now()->addWeek();
+
+        $leaveRequest = LeaveRequest::create([
+            'worker_id' => $worker->id,
+            'reason' => $request->reason,
+            'status' => 'Pending',
+            'end_date' => $endDate,
+        ]);
+
+        return response()->json(['message' => 'Leave request submitted successfully.', 'data' => $leaveRequest], 200);
+    }
 
 }
