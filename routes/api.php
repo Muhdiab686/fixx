@@ -48,8 +48,8 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::post('requestleave', [WorkerController::class, 'requestLeave']);
     });
     Route::group(["middleware" => "user"], function () {
+        Route::get('showelectrical', [AdminController::class, 'ShowElectrical']);
         Route::post("storeRequestByUser", [UserController::class,"storeRequestByUser"]);
-
         Route::post("rate_maintenance_team", [UserController::class, "rate_maintenance_team"]);
         Route::get("show_rating", [UserController::class, "show_rating"]);
         Route::delete("destroyrate", [UserController::class, "destroyrate"]);
