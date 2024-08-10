@@ -60,6 +60,9 @@ class UserController extends Controller
         $closestTeam = $maintenanceRequest->closestTeam();
         $maintenanceRequest->team()->associate($closestTeam);
         $maintenanceRequest->elec_id = $request->elec_id;
+        if($request->idapplication){
+            $maintenanceRequest->idapplication = $request->idapplication;
+        }
         $maintenanceRequest->save();
 
        
