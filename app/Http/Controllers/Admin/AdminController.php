@@ -188,9 +188,16 @@ class AdminController extends Controller
             $maintenanceRequest->warranty_state = 'غير مكفول';
         }
        
+       $maintenanceRequest->request_state = 'Complete';
         $maintenanceRequest->salary = $request->salary;
         $maintenanceRequest->save();
-
+        if ($maintenanceRequest->request_state === 'Complete') {
+            $team = Maintenance_team::find($maintenanceRequest->team_id);
+            if ($team) {
+                $team->state = 'Empty';
+                $team->save();
+            }
+        }
         return response()->json(['message' => 'Maintenance request updated successfully by admin.', 'data' => $maintenanceRequest], 200);
     }
     public function Pending_report(Request $request){

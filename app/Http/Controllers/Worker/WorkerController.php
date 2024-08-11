@@ -44,7 +44,7 @@ class WorkerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
-            'request_state' => 'string|max:255',
+           // 'request_state' => 'string|max:255',
             'consumable_parts' => 'string|max:255',
             'repairs' => 'string|max:255',
         ]);
@@ -59,20 +59,10 @@ class WorkerController extends Controller
             return response()->json(['error' => 'Maintenance request not found.'], 404);
         }
 
-        $maintenanceRequest->request_state = $request->request_state;
+        $maintenanceRequest->request_state = "Pending";
         $maintenanceRequest->consumable_parts = $request->consumable_parts;
         $maintenanceRequest->repairs = $request->repairs;
         $maintenanceRequest->save();
-
-        if ($request->request_state === 'Complete') {
-            $team = Maintenance_team::find($maintenanceRequest->team_id); 
-            if ($team) {
-                $team->state = 'Empty';
-                $team->save();
-            }
-        }
-
-
         return response()->json(['message' => 'Maintenance request updated successfully by worker.', 'data' => $maintenanceRequest], 200);
     }
 
