@@ -313,7 +313,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $schedule
-            ], 400);
+            ], 200);
     }
   public function Shownotschedling(Request $request){
     $shudle = Maintenance_Request::whereNull('start_time')
@@ -322,7 +322,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => $shudle
-        ], 400);
+        ], 200);
     }
 
     public function handleLeaveRequest(Request $request, $id)

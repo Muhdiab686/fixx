@@ -88,5 +88,4 @@ class WorkerController extends Controller
 
         return response()->json(['message' => 'Leave request submitted successfully.', 'data' => $leaveRequest], 200);
     }
-
 }
