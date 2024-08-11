@@ -14,28 +14,31 @@ use App\Models\Maintenance_team;
 
 class WorkerController extends Controller
 {
-    public function Show_request(Request $request)
-    {
+    public function Show_request(Request $request){
+       
         $team_id = Worker::where('user_id', Auth()->user()->id)->first();
-
         if ($team_id) {
             $scheduledRequests = Maintenance_Request::where('team_id', $team_id->maintenance_team_id)
                 ->whereNotNull('start_time')
                 ->whereNotNull('end_time')
                 ->get();
+
             $now = now();
             $hasCurrentRequest = $scheduledRequests->contains(function ($request) use ($now) {
-                return $request->start_time->eq($now);
+                // Check if current time is within the start and end time
+                return $now->between($request->start_time, $request->end_time);
             });
 
             if ($hasCurrentRequest) {
-                Maintenance_team::update(['state' => 'مشغول']);
+                Maintenance_team::where('id', $team_id->maintenance_team_id)->update(['state' => 'مشغول']);
             }
+
             return response()->json(['Maintenance Requests' => $scheduledRequests], 200);
         } else {
             return response()->json(['message' => 'Team not found'], 404);
         }
     }
+
 
     public function updateRequestByWorker(Request $request)
     {

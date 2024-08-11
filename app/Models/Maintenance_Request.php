@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Maintenance_Request extends Model
 {
     use HasFactory;
+    protected $dates = ['start_time', 'end_time'];
     protected $hidden = [
     ];
 
