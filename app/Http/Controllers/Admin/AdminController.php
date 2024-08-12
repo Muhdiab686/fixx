@@ -147,6 +147,7 @@ class AdminController extends Controller
                 'id'=> $team->id,
                 'team_name' => $team->name,
                 'State_team' =>$team->state,
+                'title' =>$team->title,
                 'current_workers_count' => $currentWorkersCount
             ];
         }
