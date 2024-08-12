@@ -217,33 +217,38 @@ class AdminController extends Controller
         return response()->json($report);
     }
 
-    public function Schedling(Request $request ){ {
-            $startTime = Carbon::parse($request->input('start_time'));
-            $endTime = Carbon::parse($request->input('end_time'));
-            
-            try {
-                $maintenanceRequest = Maintenance_Request::findOrFail($request->requestId);
+    public function Schedling(Request $request)
+    {
+        $startTime = Carbon::parse($request->input('start_time'));
+        $endTime = Carbon::parse($request->input('end_time'));
+        $currentTime = Carbon::now();
 
-                if ($maintenanceRequest->isConflicting($startTime, $endTime)) {
-                    throw new \Exception('The schedule conflicts with an existing request.');
-                }
-               
-                $maintenanceRequest->schedule($startTime, $endTime);
+        try {
+            if ($startTime->isBefore($currentTime) || $endTime->isBefore($currentTime)) {
+                throw new \Exception('The start time and end time must be after the current time.');
+            }
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Maintenance request scheduled successfully.'
-                ]);
+            $maintenanceRequest = Maintenance_Request::findOrFail($request->requestId);
+
+            if ($maintenanceRequest->isConflicting($startTime, $endTime)) {
+                throw new \Exception('The schedule conflicts with an existing request.');
             }
-            
-            catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ], 400);
-            }
+
+            $maintenanceRequest->schedule($startTime, $endTime);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Maintenance request scheduled successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
+
+
 
     public function GenerateStatistics(Request $request){
         
