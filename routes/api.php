@@ -20,11 +20,11 @@ use App\Http\Controllers\Admin\AdminController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::group(["middleware" => ["auth:sanctum"]], function () {
+    Route::get('showelectrical', [AdminController::class, 'ShowElectrical']);
     Route::group(["middleware" => "admin"], function () {
         Route::post('addWorker', [AdminController::class, 'AddWorker']);
         Route::delete('deleteWorker', [AdminController::class, 'DeleteWorker']);
         Route::post('addelectrical', [AdminController::class, 'AddElectrical']);
-        Route::get('showelectrical', [AdminController::class, 'ShowElectrical']);
         Route::post('updateRequestByAdmin', [AdminController::class,'updateRequestByAdmin']);
         Route::get('show_qr', [AdminController::class,'show_qr']);
         Route::get('report', [AdminController::class, 'report']);
@@ -37,10 +37,11 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::post('generateRatio', [AdminController::class, 'GenerateRatio']);
         Route::get("show_rating", [UserController::class, "show_rating"]);
 
+        Route::get('showhandlerequest', [AdminController::class, 'Showhandlerequest']);
+        Route::get('showsinglehandlerequest', [AdminController::class, 'Show_Single_handlerequest']);
         Route::post('leaverequests/{id}', [AdminController::class, 'handleLeaveRequest']);
     });
     Route::group(["middleware" => "worker"], function () {
-        Route::get('showelectrical', [AdminController::class, 'ShowElectrical']);
         Route::get('show_qr', [AdminController::class,'show_qr']);
         Route::post("updateRequestByWorker", [WorkerController::class,"updateRequestByWorker"]);
         Route::get("showRequest", [WorkerController::class, "Show_request"]);
@@ -48,11 +49,12 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::post('requestleave', [WorkerController::class, 'requestLeave']);
     });
     Route::group(["middleware" => "user"], function () {
-        Route::get('showelectrical', [AdminController::class, 'ShowElectrical']);
         Route::post("storeRequestByUser", [UserController::class,"storeRequestByUser"]);
         Route::post("rate_maintenance_team", [UserController::class, "rate_maintenance_team"]);
         Route::get("show_rating", [UserController::class, "show_rating"]);
         Route::delete("destroyrate", [UserController::class, "destroyrate"]);
+        Route::get("showrequestuser", [UserController::class, "ShowRequestUser"]);
+        Route::get("showrequestsingleuser", [UserController::class, "ShowRequestSingleUser"]);
     });
     Route::get('showTeam', [AdminController::class, 'Show_Team']);
     Route::get('showWorker', [AdminController::class, 'Show_Worker']);

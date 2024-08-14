@@ -27,6 +27,6 @@ class Worker extends Model
     
 
     public function team(){
-        return $this->belongsTo(Maintenance_team::class);
+        return $this->belongsTo(Maintenance_team::class, 'maintenance_team_id');
     }
 }

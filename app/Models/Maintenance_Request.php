@@ -41,7 +41,7 @@ class Maintenance_Request extends Model
 
     public function team()
     {
-        return $this->belongsTo(Maintenance_team::class);
+        return $this->belongsTo(Maintenance_team::class ,'team_id');
     }
     public function elec()
     {

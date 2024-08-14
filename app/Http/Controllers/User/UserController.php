@@ -162,4 +162,14 @@ class UserController extends Controller
         return response()->json(['message' => 'the rating is removed successfully.'], 201);
     }
 
+    public function ShowRequestUser(Request $request){
+        $user = Maintenance_Request::where('user_id',Auth()->user()->id)->get();
+        return response()->json($user,200);
+    }
+    public function ShowRequestSingleUser(Request $request)
+    {
+        $user = Maintenance_Request::where('id',$request->id)->with('user', 'team')->get();
+        return response()->json($user, 200);
+    }
+
 }

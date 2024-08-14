@@ -356,5 +356,14 @@ class AdminController extends Controller
         });
         return response()->json(['message' => 'Leave request updated successfully.', 'data' => $leaveRequest], 200);
     }
+    public function Showhandlerequest(Request $request){
+        $req = LeaveRequest::with([ 'worker.team','worker.user'])->get();
+        return response()->json($req);
+    }
+    public function Show_Single_handlerequest(Request $request)
+    {
+        $req = LeaveRequest::where('id',$request->id)->with(['worker.team', 'worker.user'])->get();
+        return response()->json($req);
+    }
 
 }

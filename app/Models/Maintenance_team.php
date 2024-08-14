@@ -21,11 +21,11 @@ class Maintenance_team extends Model
     ];
     public function worker()
     {
-        return $this->hasMany(Worker::class);
+        return $this->hasMany(Worker::class, 'maintenance_team_id');
     }
     public function request()
     {
-        return $this->hasMany(Maintenance_Request::class);
+        return $this->hasMany(Maintenance_Request::class , 'team_id');
     }
 
     public function rating(){
