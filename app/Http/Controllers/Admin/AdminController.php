@@ -222,10 +222,20 @@ class AdminController extends Controller
         $startTime = Carbon::parse($request->input('start_time'));
         $endTime = Carbon::parse($request->input('end_time'));
         $currentTime = Carbon::now();
+        $minTime = Carbon::createFromTime(10, 0, 0); 
+        $maxTime = Carbon::createFromTime(16, 0, 0); 
 
         try {
+            
             if ($startTime->isBefore($currentTime) || $endTime->isBefore($currentTime)) {
                 throw new \Exception('The start time and end time must be after the current time.');
+            }
+
+            if (
+                $startTime->hour < $minTime->hour || $startTime->hour >= $maxTime->hour ||
+                $endTime->hour < $minTime->hour || $endTime->hour > $maxTime->hour
+            ) {
+                throw new \Exception('The start time and end time must be between 10:00 AM and 4:00 PM.');
             }
 
             $maintenanceRequest = Maintenance_Request::findOrFail($request->requestId);
@@ -247,6 +257,7 @@ class AdminController extends Controller
             ], 400);
         }
     }
+
 
 
 
@@ -356,10 +367,19 @@ class AdminController extends Controller
         });
         return response()->json(['message' => 'Leave request updated successfully.', 'data' => $leaveRequest], 200);
     }
-    public function Showhandlerequest(Request $request){
-        $req = LeaveRequest::with([ 'worker.team','worker.user'])->get();
+    public function Showhandlerequest(Request $request)
+    {
+        $req = LeaveRequest::with(['worker.team', 'worker.user'])
+            ->orderByRaw("CASE 
+                WHEN status = 'Pending' THEN 1 
+                WHEN status = 'Approved' THEN 2 
+                WHEN status = 'Rejected' THEN 3 
+                ELSE 4 
+                END")
+            ->get();
         return response()->json($req);
     }
+
     public function Show_Single_handlerequest(Request $request)
     {
         $req = LeaveRequest::where('id',$request->id)->with(['worker.team', 'worker.user'])->get();

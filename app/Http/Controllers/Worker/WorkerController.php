@@ -19,13 +19,14 @@ class WorkerController extends Controller
         $team_id = Worker::where('user_id', Auth()->user()->id)->first();
         if ($team_id) {
             $scheduledRequests = Maintenance_Request::where('team_id', $team_id->maintenance_team_id)
+                ->where('request_state', 'Pending')
                 ->whereNotNull('start_time')
                 ->whereNotNull('end_time')
                 ->get();
 
             $now = now();
             $hasCurrentRequest = $scheduledRequests->contains(function ($request) use ($now) {
-                // Check if current time is within the start and end time
+      
                 return $now->between($request->start_time, $request->end_time);
             });
 

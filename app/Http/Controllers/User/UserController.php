@@ -65,13 +65,7 @@ class UserController extends Controller
         }
         $maintenanceRequest->save();
 
-       
-
-
-        $team = Maintenance_team::where('id',$maintenanceRequest->team_id)->first();
-        $team->state = 'Busy';
-        $team->update();
-        
+            
         return response()->json(['message' => 'Maintenance request created successfully.', 'data' => $maintenanceRequest], 201);
     }
 
