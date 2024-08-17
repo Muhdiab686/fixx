@@ -19,6 +19,7 @@ use GuzzleHttp\Client;
 use App\Models\Location;
 use GeoDistance\GeoDistance;
 use Carbon\Carbon;
+use Zxing\QrReader;
 
 class AdminController extends Controller
 {
@@ -138,14 +139,98 @@ class AdminController extends Controller
         return response()->json($part);
     }
 
-    public function show_qr(Request $request){
+        public function show_qr(Request $request){
+        if (!$request->hasFile('QR_code')) {
+            return response()->json(['error' => 'No file uploaded'], 400);
+        }
+   
+        $file = $request->file('QR_code');
 
-        $qr =  \App\Models\QRcode::where("id" ,$request->input('QRcode'))->with('part')->first();
-            return response()->json([
-                'message' => 'Done',
-                'qr_code' => $qr
-            ], 201) ;
+         if(!$file->isValid() || !in_array($file->extension(), ['jpg', 'jpeg', 'png'])) {
+            return response()->json(['error' => 'Invalid file type'], 400);
+        }
+        $path = $file->storeAs('temp', $file->getClientOriginalName());
+
+        $qrReader = new QrReader(storage_path('app/' . $path));
+        $qrText = $qrReader->text();
+        unlink(storage_path('app/' . $path));
+        if (is_numeric($qrText)) {
+            $qrNumber = $qrText + 0;
+            if($request->check == 0){
+                return $this->ShowRequestUser($request, $qrNumber);
+            }
+            if($request->check == 1){
+                return $this->storeRequestByUser($request, $qrNumber);
+
+            }
+
+
+           // return response()->json(['qr_content' => $qrNumber]);
+        }else {
+            return response()->json(['error' => 'QR code does not contain a valid number'], 400);
+        }
     }
+   
+    public function ShowRequestUser(Request $request  , $elec_id)
+    {
+        $user = Maintenance_Request::where('elec_id',$elec_id)->get();
+        return response()->json($user, 200);
+    }
+    public function storeRequestByUser(Request $request, $elec_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'free_day' => 'required|array',
+            'number' => 'required|string|max:255',
+            'notes' => 'string',
+            'request_details' => 'string',
+            'latitude' => 'required',
+            'longitude' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $maintenanceRequest = new Maintenance_Request();
+        $maintenanceRequest->free_day = implode(',', $request->free_day);
+        $maintenanceRequest->number = $request->number;
+
+        if ($request->hasFile('QR_code')) {
+            $photo = $request->QR_code;
+            $newphoto = time() . $photo->getClientOriginalName();
+            $photo->move(public_path('upload'), $newphoto);
+            $path = "public/upload/$newphoto";
+            $maintenanceRequest->QR_code = $path;
+        }
+
+        if ($request->hasFile('video')) {
+            $photo = $request->video;
+            $newphoto = time() . $photo->getClientOriginalName();
+            $photo->move(public_path('upload'), $newphoto);
+            $path = "public/upload/$newphoto";
+            $maintenanceRequest->video = $path;
+        }
+
+        $maintenanceRequest->notes = $request->notes;
+        $maintenanceRequest->request_details = $request->request_details;
+        $maintenanceRequest->latitude = $request->latitude;
+        $maintenanceRequest->longitude = $request->longitude;
+        $maintenanceRequest->user_id = auth()->user()->id;
+
+        $closestTeam = $maintenanceRequest->closestTeam();
+        $maintenanceRequest->team()->associate($closestTeam);
+        $maintenanceRequest->elec_id = $elec_id;
+
+        if ($request->idapplication) {
+            $maintenanceRequest->idapplication = $request->idapplication;
+        }
+
+        $maintenanceRequest->save();
+
+        return response()->json(['message' => 'Maintenance request created successfully.', 'data' => $maintenanceRequest], 201);
+    }
+
+
 
     public function Show_Team(Request $request)
     {

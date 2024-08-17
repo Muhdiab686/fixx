@@ -57,5 +57,5 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     Route::get('showTeam', [AdminController::class, 'Show_Team']);
     Route::get('showWorker', [AdminController::class, 'Show_Worker']);
     Route::get("show_rating", [UserController::class, "show_rating"]);
-    Route::get('show_qr', [WorkerController::class, 'show_qr']);
+    Route::post('show_qr', [AdminController::class, 'show_qr']);
 });
