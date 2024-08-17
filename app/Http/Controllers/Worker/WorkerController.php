@@ -85,7 +85,7 @@ class WorkerController extends Controller
         $request->validate([
             'reason' => 'required|string|max:255',
         ]);
-
+       
         $worker = Worker::where('user_id', Auth()->user()->id)->first();
 
         if (!$worker) {
@@ -99,6 +99,11 @@ class WorkerController extends Controller
             'status' => 'Pending',
             'end_date' => $endDate,
         ]);
+        if ($request->idapplication) {
+            $leaveRequest->idapplication = $request->idapplication;
+            $leaveRequest->save();
+        }
+
 
         return response()->json(['message' => 'Leave request submitted successfully.', 'data' => $leaveRequest], 200);
     }
@@ -119,6 +124,11 @@ class WorkerController extends Controller
             'reason' => $request->reason,
             'status' => 'Pending',
         ]);
+        
+        if ($request->idapplication) {
+            $leaveRequest->idapplication = $request->idapplication;
+            $leaveRequest->save();
+        }
 
         return response()->json(['message' => 'exit worker Pending.', 'data' => $leaveRequest], 200);
     }
