@@ -120,6 +120,18 @@ class AdminController extends Controller
         ], 201);
 
     }
+    public function deleteReq(Request $request){
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer|exists:maintenance__requests,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+        $req = Maintenance_Request::find($request->id);
+        $req->delete(); 
+        return response()->json("deleted done",200);
+    }
 
     public function ShowElectrical(Request $request){
         $part = Electrical_parts::get();
@@ -129,11 +141,9 @@ class AdminController extends Controller
     public function show_qr(Request $request){
 
         $qr =  \App\Models\QRcode::where("id" ,$request->input('QRcode'))->with('part')->first();
-         $q = $qr->electrical_part_id;
-        $request = Maintenance_Request::where('elec_id',$q)->with('elec')->get();
             return response()->json([
                 'message' => 'Done',
-                'qr_code' => $request
+                'qr_code' => $qr
             ], 201) ;
     }
 
@@ -366,6 +376,33 @@ class AdminController extends Controller
             }
         });
         return response()->json(['message' => 'Leave request updated successfully.', 'data' => $leaveRequest], 200);
+    }
+    public function handleexitworker(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Approved,Rejected',
+        ]);
+
+        $leaveRequest = LeaveRequest::find($id);
+
+        if (!$leaveRequest) {
+            return response()->json(['error' => 'Workr not found.'], 404);
+        }
+
+        DB::transaction(function () use ($leaveRequest, $request) {
+            $leaveRequest->status = $request->status;
+            $leaveRequest->save();
+
+            if ($request->status == 'Approved') {
+                $worker = Worker::find($leaveRequest->worker_id);
+                $worker->status = 'offline';
+                $worker->maintenance_team_id = null;
+                $worker->save();
+                $worker->delete();
+            }
+          
+        });
+        return response()->json(['message' => 'Exit Worker Done', 'data' => $leaveRequest], 200);
     }
     public function Showhandlerequest(Request $request)
     {

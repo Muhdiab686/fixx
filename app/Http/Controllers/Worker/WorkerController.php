@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Models\LeaveRequest;
+use App\Models\User;
 use App\Models\Worker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Models\Maintenance_Request;
@@ -39,7 +41,18 @@ class WorkerController extends Controller
             return response()->json(['message' => 'Team not found'], 404);
         }
     }
-
+    public function updateinformation(Request $request){
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+        $worker = User::where('id',Auth()->user()->id)->first();
+        $worker->password = Hash::make($request->password);
+        $worker->update();
+        return response()->json($worker,200);
+    }
 
     public function updateRequestByWorker(Request $request)
     {
@@ -88,5 +101,25 @@ class WorkerController extends Controller
         ]);
 
         return response()->json(['message' => 'Leave request submitted successfully.', 'data' => $leaveRequest], 200);
+    }
+    public function exit_Worker(Request $request)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        $worker = Worker::where('user_id', Auth()->user()->id)->first();
+
+        if (!$worker) {
+            return response()->json(['error' => 'Worker not found.'], 404);
+        }
+
+        $leaveRequest = LeaveRequest::create([
+            'worker_id' => $worker->id,
+            'reason' => $request->reason,
+            'status' => 'Pending',
+        ]);
+
+        return response()->json(['message' => 'exit worker Pending.', 'data' => $leaveRequest], 200);
     }
 }

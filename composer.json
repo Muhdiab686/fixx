@@ -6,8 +6,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "chillerlan/php-qrcode": "^5.0",
         "doctrine/dbal": "^3.2",
         "guzzlehttp/guzzle": "^7.8",
+        "khanamiryan/qrcode-detector-decoder": "^2.0",
         "laravel/framework": "^9.19",
         "laravel/passport": "^12.2",
         "laravel/sanctum": "^3.0",

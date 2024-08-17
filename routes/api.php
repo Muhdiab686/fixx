@@ -26,7 +26,6 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::delete('deleteWorker', [AdminController::class, 'DeleteWorker']);
         Route::post('addelectrical', [AdminController::class, 'AddElectrical']);
         Route::post('updateRequestByAdmin', [AdminController::class,'updateRequestByAdmin']);
-        Route::get('show_qr', [AdminController::class,'show_qr']);
         Route::get('report', [AdminController::class, 'report']);
         Route::get('finish_report', [AdminController::class, 'finish_report']);
         Route::get('pending_report', [AdminController::class, 'Pending_report']);
@@ -35,29 +34,28 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
         Route::get('show_schedling_not', [AdminController::class, 'Shownotschedling']);
         Route::post('generateStatistics', [AdminController::class, 'GenerateStatistics']);
         Route::post('generateRatio', [AdminController::class, 'GenerateRatio']);
-        Route::get("show_rating", [UserController::class, "show_rating"]);
-
         Route::get('showhandlerequest', [AdminController::class, 'Showhandlerequest']);
         Route::get('showsinglehandlerequest', [AdminController::class, 'Show_Single_handlerequest']);
         Route::post('leaverequests/{id}', [AdminController::class, 'handleLeaveRequest']);
+        Route::post('exitworker/{id}', [AdminController::class, 'handleexitworker']);
+        Route::delete('delete', [AdminController::class, 'deletereq']);
     });
     Route::group(["middleware" => "worker"], function () {
-        Route::get('show_qr', [AdminController::class,'show_qr']);
         Route::post("updateRequestByWorker", [WorkerController::class,"updateRequestByWorker"]);
         Route::get("showRequest", [WorkerController::class, "Show_request"]);
-        Route::get("show_rating", [UserController::class, "show_rating"]);
         Route::post('requestleave', [WorkerController::class, 'requestLeave']);
+        Route::post('exitworker', [WorkerController::class, 'exit_Worker']);
+        Route::post('updateinfo', [WorkerController::class, 'updateinformation']);
     });
     Route::group(["middleware" => "user"], function () {
         Route::post("storeRequestByUser", [UserController::class,"storeRequestByUser"]);
         Route::post("rate_maintenance_team", [UserController::class, "rate_maintenance_team"]);
-        Route::get("show_rating", [UserController::class, "show_rating"]);
         Route::delete("destroyrate", [UserController::class, "destroyrate"]);
         Route::get("showrequestuser", [UserController::class, "ShowRequestUser"]);
         Route::get("showrequestsingleuser", [UserController::class, "ShowRequestSingleUser"]);
     });
     Route::get('showTeam', [AdminController::class, 'Show_Team']);
     Route::get('showWorker', [AdminController::class, 'Show_Worker']);
-    
-
+    Route::get("show_rating", [UserController::class, "show_rating"]);
+    Route::get('show_qr', [WorkerController::class, 'show_qr']);
 });
