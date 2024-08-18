@@ -103,7 +103,8 @@ class WorkerController extends Controller
             $leaveRequest->idapplication = $request->idapplication;
             $leaveRequest->save();
         }
-
+        $leaveRequest->type = "vacation";
+        $leaveRequest->save();
 
         return response()->json(['message' => 'Leave request submitted successfully.', 'data' => $leaveRequest], 200);
     }
@@ -124,12 +125,13 @@ class WorkerController extends Controller
             'reason' => $request->reason,
             'status' => 'Pending',
         ]);
-        
+
         if ($request->idapplication) {
             $leaveRequest->idapplication = $request->idapplication;
             $leaveRequest->save();
         }
-
+        $leaveRequest->type = "exit";
+        $leaveRequest->save();
         return response()->json(['message' => 'exit worker Pending.', 'data' => $leaveRequest], 200);
     }
 }
